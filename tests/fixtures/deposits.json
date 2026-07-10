@@ -1,0 +1,25 @@
+{
+  "name": "deposits",
+  "actions": [
+    {
+      "label": "deposit-cold-reserve",
+      "type": "deposit",
+      "account": "inst-cold",
+      "asset": "USDC",
+      "amount": 1000000,
+      "reference": "wire:institutional:001"
+    },
+    {
+      "label": "deposit-hot-wallet",
+      "type": "deposit",
+      "account": "inst-hot",
+      "asset": "USDC",
+      "amount": 250000,
+      "reference": "wire:institutional:002"
+    },
+    {
+      "label": "audit-clean-deposits",
+      "type": "audit"
+    }
+  ]
+}

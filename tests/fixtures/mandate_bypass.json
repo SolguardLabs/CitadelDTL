@@ -1,0 +1,68 @@
+{
+  "name": "mandate_bypass",
+  "actions": [
+    {
+      "label": "fund-cold-parent",
+      "type": "deposit",
+      "account": "inst-cold",
+      "asset": "USDC",
+      "amount": 1000000
+    },
+    {
+      "label": "create-alpha-blocked",
+      "type": "create_mandate",
+      "mandate_id": "mandate-alpha",
+      "parent": "inst-cold",
+      "delegate": "delegate-alpha",
+      "owner": "Alpha Delegated Desk",
+      "asset": "USDC",
+      "daily_limit": 300000,
+      "withdrawal_limit": 250000,
+      "settlement_limit": 200000,
+      "direct_withdrawal": false,
+      "allow_internal_transfers": true,
+      "allow_operational_subaccounts": true
+    },
+    {
+      "label": "allocate-alpha-balance",
+      "type": "allocate_mandate",
+      "mandate_id": "mandate-alpha",
+      "amount": 250000
+    },
+    {
+      "label": "direct-delegate-withdraw-rejected",
+      "type": "withdraw",
+      "account": "delegate-alpha",
+      "asset": "USDC",
+      "amount": 50000,
+      "destination": "external:attacker"
+    },
+    {
+      "label": "spawn-alpha-ops",
+      "type": "create_operational_account",
+      "parent": "delegate-alpha",
+      "child": "alpha-ops-1",
+      "owner": "Alpha Ops 1"
+    },
+    {
+      "label": "move-to-alpha-ops",
+      "type": "move",
+      "from": "delegate-alpha",
+      "to": "alpha-ops-1",
+      "asset": "USDC",
+      "amount": 120000
+    },
+    {
+      "label": "ops-withdraw-bypass",
+      "type": "withdraw",
+      "account": "alpha-ops-1",
+      "asset": "USDC",
+      "amount": 120000,
+      "destination": "external:attacker"
+    },
+    {
+      "label": "audit-bypass",
+      "type": "audit"
+    }
+  ]
+}

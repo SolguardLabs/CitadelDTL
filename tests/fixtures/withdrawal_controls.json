@@ -1,0 +1,64 @@
+{
+  "name": "withdrawal_controls",
+  "actions": [
+    {
+      "label": "fund-hot",
+      "type": "deposit",
+      "account": "inst-hot",
+      "asset": "USDC",
+      "amount": 300000
+    },
+    {
+      "label": "hot-withdraw-ok",
+      "type": "withdraw",
+      "account": "inst-hot",
+      "asset": "USDC",
+      "amount": 80000,
+      "destination": "external:treasury"
+    },
+    {
+      "label": "hot-withdraw-too-much",
+      "type": "withdraw",
+      "account": "inst-hot",
+      "asset": "USDC",
+      "amount": 500000,
+      "destination": "external:treasury"
+    },
+    {
+      "label": "fund-cold",
+      "type": "deposit",
+      "account": "inst-cold",
+      "asset": "USDC",
+      "amount": 600000
+    },
+    {
+      "label": "create-blocked-mandate",
+      "type": "create_mandate",
+      "mandate_id": "mandate-blocked",
+      "parent": "inst-cold",
+      "delegate": "delegate-blocked",
+      "owner": "Blocked Delegate",
+      "asset": "USDC",
+      "daily_limit": 200000,
+      "withdrawal_limit": 150000,
+      "settlement_limit": 150000,
+      "direct_withdrawal": false,
+      "allow_internal_transfers": true,
+      "allow_operational_subaccounts": true
+    },
+    {
+      "label": "allocate-blocked",
+      "type": "allocate_mandate",
+      "mandate_id": "mandate-blocked",
+      "amount": 150000
+    },
+    {
+      "label": "delegate-direct-withdraw-rejected",
+      "type": "withdraw",
+      "account": "delegate-blocked",
+      "asset": "USDC",
+      "amount": 50000,
+      "destination": "external:blocked"
+    }
+  ]
+}

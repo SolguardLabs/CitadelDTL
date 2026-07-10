@@ -1,0 +1,32 @@
+{
+  "name": "settlement_audit",
+  "actions": [
+    {
+      "label": "fund-hot-for-liquidation",
+      "type": "deposit",
+      "account": "inst-hot",
+      "asset": "USDC",
+      "amount": 500000
+    },
+    {
+      "label": "liquidate-hot",
+      "type": "liquidate",
+      "account": "inst-hot",
+      "asset": "USDC",
+      "amount": 125000,
+      "destination": "settlement-usdc"
+    },
+    {
+      "label": "settle-omnibus",
+      "type": "settle",
+      "account": "settlement-usdc",
+      "asset": "USDC",
+      "amount": 50000,
+      "destination": "clearing:bank"
+    },
+    {
+      "label": "audit-settlement",
+      "type": "audit"
+    }
+  ]
+}

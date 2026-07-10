@@ -1,0 +1,37 @@
+{
+  "name": "mandate_allocation",
+  "actions": [
+    {
+      "label": "fund-parent",
+      "type": "deposit",
+      "account": "inst-cold",
+      "asset": "USDC",
+      "amount": 1000000
+    },
+    {
+      "label": "create-alpha-mandate",
+      "type": "create_mandate",
+      "mandate_id": "mandate-alpha",
+      "parent": "inst-cold",
+      "delegate": "delegate-alpha",
+      "owner": "Alpha Delegated Desk",
+      "asset": "USDC",
+      "daily_limit": 300000,
+      "withdrawal_limit": 250000,
+      "settlement_limit": 200000,
+      "direct_withdrawal": false,
+      "allow_internal_transfers": true,
+      "allow_operational_subaccounts": true
+    },
+    {
+      "label": "allocate-alpha",
+      "type": "allocate_mandate",
+      "mandate_id": "mandate-alpha",
+      "amount": 250000
+    },
+    {
+      "label": "audit-allocation",
+      "type": "audit"
+    }
+  ]
+}
