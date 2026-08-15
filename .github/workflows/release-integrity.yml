@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin main production --tags --force
+          git fetch origin main --tags --force
           current="$(git rev-parse HEAD)"
           if [[ "${GITHUB_REF_TYPE}" == "branch" && "${GITHUB_REF_NAME}" == "production" ]]; then
             test "${current}" = "$(git rev-parse origin/main)"
