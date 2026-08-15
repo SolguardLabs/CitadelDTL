@@ -100,10 +100,14 @@ export type ScenarioResult = {
 
 export function runFixture(name: string): ScenarioResult {
   const fixturePath = join(projectRoot, "tests", "fixtures", `${name}.json`);
-  const child = spawnSync("go", ["run", "./cmd/citadeldtl", "run", fixturePath], {
-    cwd: projectRoot,
-    encoding: "utf8",
-  });
+  const child = spawnSync(
+    "go",
+    ["run", "./cmd/citadeldtl", "run", fixturePath],
+    {
+      cwd: projectRoot,
+      encoding: "utf8",
+    },
+  );
   if (child.status !== 0) {
     throw new Error(
       [
@@ -129,7 +133,10 @@ export function listScenarios(): string[] {
   return child.stdout.trim().split(/\r?\n/).filter(Boolean);
 }
 
-export function resultByLabel(result: ScenarioResult, label: string): ActionResult {
+export function resultByLabel(
+  result: ScenarioResult,
+  label: string,
+): ActionResult {
   const found = result.results.find((entry) => entry.label === label);
   if (!found) {
     throw new Error(`missing action label ${label}`);
@@ -137,9 +144,15 @@ export function resultByLabel(result: ScenarioResult, label: string): ActionResu
   return found;
 }
 
-export function balanceOf(result: ScenarioResult, account: string, asset = "USDC") {
+export function balanceOf(
+  result: ScenarioResult,
+  account: string,
+  asset = "USDC",
+) {
   return (
-    result.snapshot.balances.find((line) => line.account === account && line.asset === asset) ?? {
+    result.snapshot.balances.find(
+      (line) => line.account === account && line.asset === asset,
+    ) ?? {
       account,
       asset,
       available: 0,

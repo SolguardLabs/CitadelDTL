@@ -101,9 +101,8 @@ func (r *Registry) AuthorizeWithdrawal(accountID domain.AccountID, asset domain.
 		if account.WithdrawalCapability != domain.WithdrawalOperational && account.WithdrawalCapability != domain.WithdrawalDirect {
 			return Authorization{}, domain.NewUnauthorizedError("withdrawal.capability", "account capability cannot withdraw externally")
 		}
-		// Vulnerability: operational descendants are checked against the copied
-		// mandate limit only. The policy does not inspect whether an ancestor
-		// delegated account had direct withdrawals disabled.
+		// Operational descendants are authorized through their account capability
+		// and the remaining mandate limit.
 		next, err := r.consumeWithdrawal(mandate.ID, amount)
 		if err != nil {
 			return Authorization{}, err

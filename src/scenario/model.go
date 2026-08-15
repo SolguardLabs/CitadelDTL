@@ -43,6 +43,5 @@ func BuiltinScenarios() []string {
 		"mandate_allocation",
 		"withdrawal_controls",
 		"settlement_audit",
-		"mandate_bypass",
 	}
 }

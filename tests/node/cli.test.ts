@@ -8,7 +8,5 @@ test("cli lists deterministic public scenarios", () => {
     "mandate_allocation",
     "withdrawal_controls",
     "settlement_audit",
-    "mandate_bypass",
   ]);
 });
-

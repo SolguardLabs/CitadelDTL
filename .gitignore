@@ -1,6 +1,9 @@
 node_modules/
-vulnerability.md
+tests/private/
 bin/
 dist/
 coverage/
 *.log
+.env
+.env.*
+!.env.example
