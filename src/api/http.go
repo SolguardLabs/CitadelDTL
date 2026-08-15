@@ -17,6 +17,10 @@ func NewHTTPServer(service *Service) *HTTPServer {
 }
 
 func (s *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("cache-control", "no-store")
+	w.Header().Set("content-security-policy", "default-src 'none'; frame-ancestors 'none'")
+	w.Header().Set("referrer-policy", "no-referrer")
+	w.Header().Set("x-content-type-options", "nosniff")
 	s.mux.ServeHTTP(w, r)
 }
 
@@ -35,7 +39,7 @@ func (s *HTTPServer) handleAudit(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeJSON(w http.ResponseWriter, status int, value interface{}) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("content-type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(value)
 }

@@ -14,4 +14,3 @@ test("liquidation and settlement receipts update omnibus balances and audit with
   assert.equal(result.snapshot.summary.processed_receipts, 2);
   assert.equal(result.snapshot.summary.critical_issues, 0);
 });
-

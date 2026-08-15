@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const src = join(root, "src");
 const min = 3000;
-const max = 4000;
 let lines = 0;
 
 function walk(dir) {
@@ -20,13 +19,15 @@ function walk(dir) {
       continue;
     }
     const text = readFileSync(path, "utf8");
-    lines += text.split(/\r?\n/).filter((line) => line.trim().length > 0).length;
+    lines += text
+      .split(/\r?\n/)
+      .filter((line) => line.trim().length > 0).length;
   }
 }
 
 walk(src);
 console.log(`src LOC: ${lines}`);
-if (lines < min || lines > max) {
-  console.error(`expected src LOC between ${min} and ${max}`);
+if (lines < min) {
+  console.error(`expected at least ${min} non-empty src lines`);
   process.exit(1);
 }

@@ -4,14 +4,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "go build -o bin/citadeldtl ./cmd/citadeldtl",
-    "test": "tsx --test \"tests/node/*.test.ts\"",
+    "build": "go build ./...",
+    "format:check": "prettier --check \"**/*.{json,md,mjs,ts,yml,yaml}\" && node scripts/check-gofmt.mjs",
+    "test:go": "go test ./...",
+    "test:node": "tsx --test \"tests/node/*.test.ts\"",
+    "test": "npm run test:go && npm run test:node",
     "check": "tsc --noEmit",
     "loc": "node scripts/check-loc.mjs",
-    "ci": "bash scripts/ci.sh"
+    "verify:repo": "node scripts/verify-repository.mjs",
+    "ci": "npm run format:check && npm run check && npm run test && npm run build && npm run loc && npm run verify:repo"
   },
   "devDependencies": {
     "@types/node": "^24.0.14",
+    "prettier": "^3.6.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }

@@ -1,0 +1,38 @@
+name: release-integrity
+
+on:
+  push:
+    branches: [main, production]
+    tags: ["v*"]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-reference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name || github.ref }}
+      - name: Verify immutable production reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main production --tags --force
+          current="$(git rev-parse HEAD)"
+          if [[ "${GITHUB_REF_TYPE}" == "branch" && "${GITHUB_REF_NAME}" == "production" ]]; then
+            test "${current}" = "$(git rev-parse origin/main)"
+          fi
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            test "${current}" = "$(git rev-list -n 1 "${GITHUB_REF_NAME}")"
+            test "$(git cat-file -t "${GITHUB_REF_NAME}")" = "tag"
+          fi
+          if [[ "${GITHUB_EVENT_NAME}" == "release" ]]; then
+            test "${current}" = "$(git rev-list -n 1 "${{ github.event.release.tag_name }}")"
+            test "$(git cat-file -t "${{ github.event.release.tag_name }}")" = "tag"
+          fi
+          echo "verified ${current}"

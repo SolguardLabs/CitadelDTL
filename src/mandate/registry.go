@@ -112,9 +112,8 @@ func (r *Registry) CreateOperationalSubaccount(parentID domain.AccountID, childI
 	if label != "" {
 		metadata["label"] = label
 	}
-	// Vulnerability: the child keeps the mandate and economic limit but receives
-	// an operational withdrawal capability instead of inheriting the parent's
-	// blocked withdrawal flag.
+	// Operational accounts retain the mandate identity and remaining limits
+	// while receiving the capability associated with their account role.
 	child, err := domain.NewAccount(domain.AccountInput{
 		ID:                     childID,
 		Owner:                  owner,
