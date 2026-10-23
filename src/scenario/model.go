@@ -25,6 +25,8 @@ type Action struct {
 	DailyLimit                  domain.Amount     `json:"daily_limit"`
 	WithdrawalLimit             domain.Amount     `json:"withdrawal_limit"`
 	SettlementLimit             domain.Amount     `json:"settlement_limit"`
+	LiquidityReference          domain.Amount     `json:"liquidity_reference,omitempty"`
+	RiskBudget                  domain.Amount     `json:"risk_budget,omitempty"`
 	DirectWithdrawal            bool              `json:"direct_withdrawal"`
 	AllowInternalTransfers      bool              `json:"allow_internal_transfers"`
 	AllowOperationalSubaccounts bool              `json:"allow_operational_subaccounts"`

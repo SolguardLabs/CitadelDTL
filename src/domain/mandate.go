@@ -1,5 +1,7 @@
 package domain
 
+import "math/big"
+
 type Mandate struct {
 	ID                          MandateID     `json:"id"`
 	ParentAccount               AccountID     `json:"parent_account"`
@@ -11,6 +13,10 @@ type Mandate struct {
 	SettlementLimit             Amount        `json:"settlement_limit"`
 	UsedDaily                   Amount        `json:"used_daily"`
 	UsedSettlement              Amount        `json:"used_settlement"`
+	UsedWithdrawals             Amount        `json:"used_withdrawals"`
+	LiquidityReference          Amount        `json:"liquidity_reference"`
+	RiskBudget                  Amount        `json:"risk_budget"`
+	RiskUsed                    Amount        `json:"risk_used"`
 	DirectWithdrawal            bool          `json:"direct_withdrawal"`
 	AllowInternalTransfers      bool          `json:"allow_internal_transfers"`
 	AllowOperationalSubaccounts bool          `json:"allow_operational_subaccounts"`
@@ -29,6 +35,8 @@ type MandateInput struct {
 	DailyLimit                  Amount
 	WithdrawalLimit             Amount
 	SettlementLimit             Amount
+	LiquidityReference          Amount
+	RiskBudget                  Amount
 	DirectWithdrawal            bool
 	AllowInternalTransfers      bool
 	AllowOperationalSubaccounts bool
@@ -77,6 +85,8 @@ func NewMandate(input MandateInput) (Mandate, error) {
 		DailyLimit:                  input.DailyLimit,
 		WithdrawalLimit:             withdrawalLimit,
 		SettlementLimit:             settlementLimit,
+		LiquidityReference:          input.LiquidityReference,
+		RiskBudget:                  input.RiskBudget,
 		DirectWithdrawal:            input.DirectWithdrawal,
 		AllowInternalTransfers:      input.AllowInternalTransfers,
 		AllowOperationalSubaccounts: input.AllowOperationalSubaccounts,
@@ -115,6 +125,32 @@ func (m Mandate) Validate() error {
 	}
 	if err := m.UsedSettlement.ValidateNonNegative("used settlement"); err != nil {
 		return err
+	}
+	if err := m.UsedWithdrawals.ValidateNonNegative("used withdrawals"); err != nil {
+		return err
+	}
+	if err := m.RiskUsed.ValidateNonNegative("risk used"); err != nil {
+		return err
+	}
+	if m.RiskBudget != 0 || m.LiquidityReference != 0 {
+		if err := m.RiskBudget.ValidatePositive("risk budget"); err != nil {
+			return err
+		}
+		if err := m.LiquidityReference.ValidatePositive("liquidity reference"); err != nil {
+			return err
+		}
+		if m.LiquidityReference < m.WithdrawalLimit {
+			return NewValidationError("mandate.liquidity_reference", "liquidity reference must cover withdrawal limit")
+		}
+		if m.RiskBudget > m.LiquidityReference {
+			return NewValidationError("mandate.risk_budget", "risk budget cannot exceed liquidity reference")
+		}
+		if m.RiskUsed > m.RiskBudget {
+			return NewValidationError("mandate.risk_budget", "risk usage exceeds budget")
+		}
+	}
+	if m.UsedWithdrawals > m.UsedDaily {
+		return NewValidationError("mandate.usage", "withdrawal usage exceeds daily usage")
 	}
 	if err := m.Status.Validate(); err != nil {
 		return err
@@ -175,7 +211,33 @@ func (m Mandate) CanConsumeWithdrawal(amount Amount, epoch Epoch) error {
 	if amount > m.RemainingWithdrawal() {
 		return NewLimitExceededError("mandate.withdrawal_limit", "withdrawal exceeds remaining mandate limit")
 	}
+	if m.RiskBudget > 0 {
+		charge, err := m.ProspectiveRiskCharge(amount)
+		if err != nil {
+			return err
+		}
+		if charge > m.RiskBudget-m.RiskUsed {
+			return NewLimitExceededError("mandate.risk_budget", "withdrawal exceeds liquidity risk budget")
+		}
+	}
 	return nil
+}
+
+func (m Mandate) ProspectiveRiskCharge(amount Amount) (Amount, error) {
+	if err := amount.ValidatePositive("risk amount"); err != nil {
+		return 0, err
+	}
+	if m.LiquidityReference <= 0 {
+		return 0, NewValidationError("mandate.liquidity_reference", "liquidity reference is required")
+	}
+	numerator := new(big.Int).Mul(big.NewInt(int64(amount)), big.NewInt(int64(amount)))
+	denominator := big.NewInt(int64(m.LiquidityReference))
+	numerator.Add(numerator, new(big.Int).Sub(denominator, big.NewInt(1)))
+	numerator.Quo(numerator, denominator)
+	if !numerator.IsInt64() {
+		return 0, NewInvariantError("mandate.risk_overflow", "risk charge exceeds supported amount")
+	}
+	return Amount(numerator.Int64()), nil
 }
 
 func (m Mandate) CanConsumeSettlement(amount Amount, epoch Epoch) error {
@@ -197,6 +259,14 @@ func (m Mandate) ConsumeWithdrawal(amount Amount, epoch Epoch) (Mandate, error) 
 	}
 	next := m
 	next.UsedDaily += amount
+	next.UsedWithdrawals += amount
+	if m.RiskBudget > 0 {
+		charge, err := m.ProspectiveRiskCharge(amount)
+		if err != nil {
+			return m, err
+		}
+		next.RiskUsed += charge
+	}
 	return next, next.Validate()
 }
 
@@ -214,6 +284,8 @@ func (m Mandate) ResetUsage() Mandate {
 	next := m
 	next.UsedDaily = 0
 	next.UsedSettlement = 0
+	next.UsedWithdrawals = 0
+	next.RiskUsed = 0
 	return next
 }
 
@@ -237,6 +309,10 @@ type MandateLine struct {
 	SettlementLimit             Amount        `json:"settlement_limit"`
 	UsedDaily                   Amount        `json:"used_daily"`
 	UsedSettlement              Amount        `json:"used_settlement"`
+	UsedWithdrawals             Amount        `json:"used_withdrawals"`
+	LiquidityReference          Amount        `json:"liquidity_reference"`
+	RiskBudget                  Amount        `json:"risk_budget"`
+	RiskUsed                    Amount        `json:"risk_used"`
 	DirectWithdrawal            bool          `json:"direct_withdrawal"`
 	AllowInternalTransfers      bool          `json:"allow_internal_transfers"`
 	AllowOperationalSubaccounts bool          `json:"allow_operational_subaccounts"`
@@ -258,6 +334,10 @@ func NewMandateLine(m Mandate) MandateLine {
 		SettlementLimit:             m.SettlementLimit,
 		UsedDaily:                   m.UsedDaily,
 		UsedSettlement:              m.UsedSettlement,
+		UsedWithdrawals:             m.UsedWithdrawals,
+		LiquidityReference:          m.LiquidityReference,
+		RiskBudget:                  m.RiskBudget,
+		RiskUsed:                    m.RiskUsed,
 		DirectWithdrawal:            m.DirectWithdrawal,
 		AllowInternalTransfers:      m.AllowInternalTransfers,
 		AllowOperationalSubaccounts: m.AllowOperationalSubaccounts,

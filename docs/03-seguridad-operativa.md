@@ -28,7 +28,9 @@ flowchart TD
     ASSET -->|No coincide| REJECT
     ASSET -->|Coincide| CAPABILITY{"Capacidad del rol"}
     CAPABILITY -->|No| REJECT
-    CAPABILITY -->|Sí| LIMIT{"Saldo y límites"}
+    CAPABILITY -->|Sí| LINEAGE{"Linaje autorizado"}
+    LINEAGE -->|No| REJECT
+    LINEAGE -->|Sí| LIMIT{"Saldo, límites y presupuesto"}
     LIMIT -->|Insuficiente| REJECT
     LIMIT -->|Suficiente| COMMIT["Movimiento y recibo"]
     COMMIT --> AUDIT["Conciliación posterior"]

@@ -46,6 +46,9 @@ func (r *Registry) CreateMandate(input domain.MandateInput) (domain.Mandate, err
 	if input.SegregationID.Empty() {
 		input.SegregationID = parent.SegregationID
 	}
+	if input.RiskBudget > 0 && input.LiquidityReference > r.book.BalanceOf(parent.ID, input.Asset.Normalize()).Available {
+		return domain.Mandate{}, domain.NewValidationError("mandate.liquidity_reference", "liquidity reference exceeds funded parent balance")
+	}
 	input.CreatedEpoch = r.book.Epoch()
 	mandate, err := domain.NewMandate(input)
 	if err != nil {

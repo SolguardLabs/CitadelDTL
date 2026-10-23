@@ -13,6 +13,12 @@
 
 La disponibilidad no prevalece sobre la conservación. Si la aplicación no puede demostrar la versión de saldo o el presupuesto de un mandato, se cierra escritura y se mantiene lectura.
 
+En mandatos con presupuesto de liquidez, el snapshot operativo incluye
+`used_withdrawals`, `risk_used`, `risk_budget` y `liquidity_reference`. Al
+cerrar una época se reinicia el consumo diario y de riesgo, conservando en el
+diario las retiradas y sus recibos. Los operadores deben conciliar importe
+externalizado, uso nominal y carga de liquidez antes de reabrir escritura.
+
 ## Despliegue
 
 ```mermaid

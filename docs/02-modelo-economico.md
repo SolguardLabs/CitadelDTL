@@ -11,6 +11,12 @@ Las cantidades monetarias son enteros en la unidad mínima del activo. Los porce
 
 No se usan números de coma flotante en las decisiones.
 
+El presupuesto de liquidez de un mandato es un control preventivo de la ruta
+de retirada, distinto del informe agregado de capital. Trabaja con una
+referencia de capacidad, consumo acumulado por época y una carga convexa por
+operación; el débito externo solo puede avanzar si quedan límite nominal y
+presupuesto. Consulte [Presupuesto de liquidez](08-presupuesto-liquidez.md).
+
 ## Capital por segregación
 
 Sea:
