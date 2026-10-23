@@ -13,6 +13,7 @@ CitadelDTL es una infraestructura de custodia institucional y liquidación progr
 
 - Libro contable por cuenta, activo y segregación, con diario inmutable en memoria.
 - Mandatos institucionales con límites diarios, de retirada y de liquidación.
+- Presupuesto opcional de riesgo de liquidez convexo para retiradas delegadas.
 - Cuentas delegadas y operativas con capacidades explícitas.
 - Depósitos, transferencias internas, retiradas, liquidaciones y recibos.
 - Conciliación de pasivos de custodia frente a reservas segregadas.
@@ -101,6 +102,13 @@ flowchart TD
 
 Un ejemplo con pasivo `1_000`, reservas `900`, recorte del `10 %`, salidas `100`, estrés del `50 %` y coste operativo del `1 %` produce reserva efectiva `810`, capital requerido `1_160` y déficit `350`. Los detalles y escenarios de cartera están en [Modelo económico](./docs/02-modelo-economico.md).
 
+Los mandatos también pueden incorporar `liquidity_reference` y `risk_budget`.
+Esta capa preventiva consume una carga de liquidez antes del débito externo,
+además del límite nominal y del control de linaje. La carga depende de la
+concentración del importe frente a la referencia de capacidad y se registra
+por época. El presupuesto no reemplaza la conciliación de reservas. Véase
+[Presupuesto de liquidez](./docs/08-presupuesto-liquidez.md).
+
 ## Inicio rápido
 
 Requisitos:
@@ -171,9 +179,10 @@ La matriz oficial valida Ubuntu y Windows. La rama `production`, la etiqueta ano
 - [Operación y recuperación](./docs/05-operacion.md)
 - [Gobernanza y gestión de cambios](./docs/06-gobernanza.md)
 - [Observabilidad y conciliación](./docs/07-observabilidad.md)
+- [Presupuesto de liquidez de mandatos](./docs/08-presupuesto-liquidez.md)
 
 ## Versionado
 
-Se usa SemVer. `v1.0.0` define el primer contrato estable del motor, el formato de escenarios, el cliente y las políticas operativas. Los cambios incompatibles requieren una versión mayor y un plan de migración documentado.
+Se usa SemVer. `v2.0.0` amplía el contrato de mandatos con un presupuesto opcional de liquidez y control de linaje en retiradas. La versión `v1.0.0` permanece en el historial. Los cambios incompatibles requieren una versión mayor y un plan de migración documentado.
 
 La política de comunicación y respuesta está en [SECURITY.md](./SECURITY.md). El software se distribuye bajo los términos de [LICENSE](./LICENSE).

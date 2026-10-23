@@ -24,6 +24,8 @@ type MandateRequest struct {
 	DailyLimit                  domain.Amount
 	WithdrawalLimit             domain.Amount
 	SettlementLimit             domain.Amount
+	LiquidityReference          domain.Amount
+	RiskBudget                  domain.Amount
 	DirectWithdrawal            bool
 	AllowInternalTransfers      bool
 	AllowOperationalSubaccounts bool
@@ -75,6 +77,8 @@ func (s *Service) CreateMandate(label string, req MandateRequest) domain.ActionR
 		DailyLimit:                  req.DailyLimit,
 		WithdrawalLimit:             req.WithdrawalLimit,
 		SettlementLimit:             req.SettlementLimit,
+		LiquidityReference:          req.LiquidityReference,
+		RiskBudget:                  req.RiskBudget,
 		DirectWithdrawal:            req.DirectWithdrawal,
 		AllowInternalTransfers:      req.AllowInternalTransfers,
 		AllowOperationalSubaccounts: req.AllowOperationalSubaccounts,
@@ -90,7 +94,9 @@ func (s *Service) CreateMandate(label string, req MandateRequest) domain.ActionR
 		WithDetail("direct_withdrawal", mandate.DirectWithdrawal).
 		WithDetail("daily_limit", mandate.DailyLimit).
 		WithDetail("withdrawal_limit", mandate.WithdrawalLimit).
-		WithDetail("settlement_limit", mandate.SettlementLimit)
+		WithDetail("settlement_limit", mandate.SettlementLimit).
+		WithDetail("liquidity_reference", mandate.LiquidityReference).
+		WithDetail("risk_budget", mandate.RiskBudget)
 }
 
 func (s *Service) AllocateMandate(label string, mandateID domain.MandateID, amount domain.Amount, reference string) domain.ActionResult {

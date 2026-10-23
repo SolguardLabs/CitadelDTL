@@ -71,6 +71,9 @@ func (r *Registry) AuthorizeWithdrawal(accountID domain.AccountID, asset domain.
 		if !mandate.DirectWithdrawal {
 			return Authorization{}, domain.NewUnauthorizedError("mandate.direct_withdrawal_blocked", "delegated account cannot withdraw directly")
 		}
+		if err := r.CheckWithdrawalWouldBeSafe(accountID); err != nil {
+			return Authorization{}, err
+		}
 		if account.WithdrawalCapability == domain.WithdrawalBlocked {
 			return Authorization{}, domain.NewUnauthorizedError("withdrawal.blocked", "account withdrawal capability is blocked")
 		}
@@ -86,6 +89,9 @@ func (r *Registry) AuthorizeWithdrawal(accountID domain.AccountID, asset domain.
 			UsedMandate: true,
 			Message:     "delegated withdrawal authorized",
 		}, nil
+	}
+	if err := r.CheckWithdrawalWouldBeSafe(accountID); err != nil {
+		return Authorization{}, err
 	}
 	if account.WithdrawalCapability == domain.WithdrawalBlocked {
 		return Authorization{}, domain.NewUnauthorizedError("withdrawal.blocked", "account withdrawal capability is blocked")

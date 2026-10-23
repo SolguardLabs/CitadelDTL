@@ -6,7 +6,8 @@ CitadelDTL procesa estados de custodia y decisiones de liquidación. La segurida
 
 | Versión   | Estado       | Actualizaciones de seguridad |
 | --------- | ------------ | ---------------------------- |
-| `1.x`     | Mantenida    | Sí                           |
+| `2.x`     | Mantenida    | Sí                           |
+| `1.x`     | Histórica    | Según política de soporte    |
 | `< 1.0.0` | No mantenida | No                           |
 
 Las correcciones se publican sobre la última versión menor mantenida. Una corrección que altere formatos, redondeos o estados incluye guía de migración.
@@ -33,6 +34,8 @@ El proxy de entrada autentica identidades y aplica límites de solicitud. Citade
 - Un recibo procesado corresponde a un único movimiento y referencia.
 - Ningún saldo disponible, reservado o segregado puede ser negativo.
 - El consumo de mandato nunca se contabiliza fuera de su época.
+- Una restricción de retirada de un ancestro se conserva en sus cuentas operativas descendientes.
+- Un débito delegado requiere límite nominal y presupuesto de liquidez disponible.
 - Los cambios de parámetros quedan ligados a red, destino, método, carga, predecesor, sal y época.
 - Las cantidades se transmiten como enteros decimales; no se aceptan números de coma flotante.
 - Los informes de conciliación son reproducibles desde el snapshot y el diario.

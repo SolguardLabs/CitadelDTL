@@ -18,7 +18,7 @@ test("repository ships the approved visual identity", () => {
   );
 });
 
-test("documentation contract contains seven linked guides and rich diagrams", () => {
+test("documentation contract contains eight linked guides and rich diagrams", () => {
   const docs = readdirSync(join(projectRoot, "docs"))
     .filter((name) => name.endsWith(".md"))
     .sort();
@@ -30,6 +30,7 @@ test("documentation contract contains seven linked guides and rich diagrams", ()
     "05-operacion.md",
     "06-gobernanza.md",
     "07-observabilidad.md",
+    "08-presupuesto-liquidez.md",
   ]);
   const readme = readFileSync(join(projectRoot, "README.md"), "utf8");
   for (const name of docs)

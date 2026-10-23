@@ -58,6 +58,8 @@ func applyAction(service *api.Service, action Action) (domain.ActionResult, erro
 			DailyLimit:                  action.DailyLimit,
 			WithdrawalLimit:             action.WithdrawalLimit,
 			SettlementLimit:             action.SettlementLimit,
+			LiquidityReference:          action.LiquidityReference,
+			RiskBudget:                  action.RiskBudget,
 			DirectWithdrawal:            action.DirectWithdrawal,
 			AllowInternalTransfers:      action.AllowInternalTransfers,
 			AllowOperationalSubaccounts: action.AllowOperationalSubaccounts,
