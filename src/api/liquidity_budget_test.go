@@ -49,6 +49,34 @@ func TestMandateLiquidityBudgetIsAppliedToWithdrawal(t *testing.T) {
 	}
 }
 
+func TestMandateLiquidityBudgetRequiresFundedReferenceAndBoundedBudget(t *testing.T) {
+	s, err := NewService()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result := s.Deposit("fund", ledger.DefaultHotAccount, domain.AssetUSDC, 500_000, "funding"); result.Status != domain.ResultAccepted {
+		t.Fatalf("deposit: %+v", result)
+	}
+	request := MandateRequest{
+		ID: "mandate-risk", ParentAccount: ledger.DefaultHotAccount,
+		DelegateAccount: "delegate-risk", Asset: domain.AssetUSDC,
+		DailyLimit: 400_000, WithdrawalLimit: 400_000,
+		SettlementLimit: 400_000, DirectWithdrawal: true,
+		LiquidityReference: 600_000, RiskBudget: 200_000,
+	}
+	if result := s.CreateMandate("unfunded", request); result.Status != domain.ResultRejected || result.Reason != "mandate.liquidity_reference" {
+		t.Fatalf("unfunded reference should be rejected: %+v", result)
+	}
+	request.LiquidityReference = 500_000
+	request.RiskBudget = 600_000
+	if result := s.CreateMandate("unbounded", request); result.Status != domain.ResultRejected || result.Reason != "mandate.risk_budget" {
+		t.Fatalf("budget above reference should be rejected: %+v", result)
+	}
+	if _, ok := s.Snapshot().MandateByID(request.ID); ok {
+		t.Fatal("rejected mandate changed registry")
+	}
+}
+
 func TestBlockedMandateLineageCannotWithdrawThroughOperationalAccount(t *testing.T) {
 	s, err := NewService()
 	if err != nil {
